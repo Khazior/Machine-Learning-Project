@@ -192,12 +192,9 @@ with tab1:
 # --- TAB 2: UPLOAD FILE (BATCH) ---
 with tab2:
     st.header("Upload File CSV")
+    st.write("Silakan upload file CSV berisi data transaksi nasabah.")
     
-    data_type = st.radio(
-        "Jenis data yang diupload:",
-        ("Data Original", 
-         "Data Angka Numerik")
-    )
+    # HAPUS: Radio button sudah dibuang
     
     uploaded_file = st.file_uploader("Pilih file CSV", type=["csv"])
     
@@ -208,9 +205,23 @@ with tab2:
         
         if st.button("Proses & Prediksi Batch"):
             try:
-                is_norm = True if "Normalisasi" in data_type else False
+                # --- LOGIKA DETEKSI OTOMATIS (AUTO-DETECT) ---
+                # Kita cek rata-rata kolom CustomerAge.
+                # Data Normalisasi biasanya berkisar -2 s/d 2 (rata-rata mendekati 0).
+                # Data Asli umurnya pasti di atas 17 tahun.
                 
-                # 1. Pipeline
+                is_norm = False # Default anggap data asli
+                
+                if 'CustomerAge' in df_upload.columns:
+                    mean_age = df_upload['CustomerAge'].mean()
+                    if mean_age < 15: # Threshold aman
+                        is_norm = True
+                        st.info("ℹ️ Sistem mendeteksi input adalah **Data Numerik (Normalisasi)**. Melakukan konversi ke Data Asli...")
+                    else:
+                        is_norm = False
+                        st.info("ℹ️ Sistem mendeteksi input adalah **Data Original**.")
+                
+                # 1. Pipeline (Inverse otomatis jika is_norm=True)
                 X_batch, df_clean = proses_prediction_pipeline(df_upload, is_normalized=is_norm)
                 
                 # 2. Prediksi
@@ -218,16 +229,10 @@ with tab2:
                 
                 # 3. Gabung Hasil
                 df_hasil = df_clean.copy()
-                
-                # --- UPDATE: HANYA LABEL_CLUSTER, TANPA PREDIKSI_CLUSTER ---
-                # Kita langsung mapping dari hasil prediksi raw ke Label
                 df_hasil['Label_Cluster'] = pd.Series(prediksi_raw).map({1: 'Fraud', 0: 'Non-Fraud'})
                 
-                # 4. Tampilkan Info
-                if is_norm:
-                    st.success("✅ Data berhasil dikembalikan ke format asli!")
-                else:
-                    st.success("✅ Data berhasil diproses!")
+                # 4. Tampilkan Info Sukses
+                st.success("✅ Proses Selesai! Klasifikasi Fraud/Non-Fraud berhasil.")
                 
                 st.write("Preview Hasil Akhir:")
                 st.dataframe(df_hasil.head())
@@ -235,12 +240,12 @@ with tab2:
                 # 5. Download
                 csv = df_hasil.to_csv(index=False).encode('utf-8')
                 st.download_button(
-                    label="📥 Download Hasil Prediksi (CSV)",
+                    label="📥 Download Hasil (CSV)",
                     data=csv,
-                    file_name="hasil_prediksi_final.csv",
+                    file_name="hasil_fraud_detection.csv",
                     mime="text/csv"
                 )
                 
             except Exception as e:
                 st.error(f"Terjadi kesalahan: {e}")
-                st.warning("Tips: Pastikan pilihan 'Jenis Data' sesuai dengan file yang diupload.")
+                st.warning("Pastikan file CSV memiliki kolom yang sesuai (TransactionAmount, CustomerAge, dll).")
