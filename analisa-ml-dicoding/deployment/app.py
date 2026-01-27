@@ -58,7 +58,7 @@ EXPECTED_COLUMNS = [
     'Location_Tucson', 'Location_Virginia Beach', 'Location_Washington', 
     'Channel_Branch', 'Channel_Online', 
     'CustomerOccupation_Engineer', 'CustomerOccupation_Retired', 'CustomerOccupation_Student', 
-    'CustomerAgeGroup_Muda', 'CustomerAgeGroup_Tua'
+    'AgeGroup_Old', 'AgeGroup_Young'
 ]
 
 # ==========================================
@@ -66,9 +66,9 @@ EXPECTED_COLUMNS = [
 # ==========================================
 
 def determine_age_group(age):
-    if age <= 32: return 'Muda'
-    elif age <= 55: return 'Dewasa'
-    else: return 'Tua'
+    if age <= 32: return 'Young'
+    elif age <= 55: return 'Mature'
+    else: return 'Old'
 
 def inverse_transform_data(df, stats, mapping):
     """Converts normalized data back to original format."""
@@ -109,7 +109,7 @@ def process_prediction_pipeline(df_input, is_normalized=False):
 
     # Step 2: Handle Age Group
     if 'CustomerAge' in df_proc.columns:
-        df_proc['CustomerAgeGroup'] = df_proc['CustomerAge'].apply(determine_age_group)
+        df_proc['AgeGroup'] = df_proc['CustomerAge'].apply(determine_age_group)
 
     # Step 3: One-Hot Encoding
     df_encoded = pd.get_dummies(df_proc)
