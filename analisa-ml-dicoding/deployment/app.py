@@ -3,18 +3,19 @@ import pandas as pd
 import joblib
 
 # ==========================================
-# 1. SETUP & DATA STATISTIK
+# 1. SETUP & DATA STATISTICS
 # ==========================================
-st.set_page_config(page_title="Prediksi Segmen Nasabah (Final)", page_icon="🚀", layout="wide")
+st.set_page_config(page_title="Fraud Detection System", page_icon="🚀", layout="wide")
 
 # Load Model
 try:
+    # Ensure this path matches your GitHub repository structure
     model = joblib.load('analisa-ml-dicoding/deployment/tuning_classification.h5')
 except FileNotFoundError:
-    st.error("❌ File 'analisa-ml-dicoding/deployment/tuning_classification.h5' tidak ditemukan!")
+    st.error("❌ File 'analisa-ml-dicoding/deployment/tuning_classification.h5' not found!")
     st.stop()
 
-# --- STATISTIK UNTUK INVERSE SCALING (NUMERIK) ---
+# --- STATISTICS FOR INVERSE SCALING (NUMERICAL) ---
 STATS = {
     'TransactionAmount': {'mean': 256.84, 'std': 218.37},
     'CustomerAge':       {'mean': 44.69, 'std': 17.74},
@@ -23,7 +24,7 @@ STATS = {
     'AccountBalance':    {'mean': 5100.81, 'std': 3907.15}
 }
 
-# --- MAPPING KATEGORI LENGKAP (NUMERIK -> TEKS) ---
+# --- COMPLETE CATEGORY MAPPING (NUMERICAL -> TEXT) ---
 CAT_MAPPING = {
     'TransactionType': {1: 'Debit', 0: 'Credit'},
     'Channel': {0: 'ATM', 2: 'Online', 1: 'Branch'},
@@ -41,7 +42,7 @@ CAT_MAPPING = {
     }
 }
 
-# Daftar Kolom Wajib Model
+# Mandatory Columns for Model
 EXPECTED_COLUMNS = [
     'TransactionAmount', 'CustomerAge', 'TransactionDuration', 'LoginAttempts', 'AccountBalance',
     'TransactionType_Debit', 'Location_Atlanta', 'Location_Austin', 'Location_Baltimore', 
@@ -61,19 +62,19 @@ EXPECTED_COLUMNS = [
 ]
 
 # ==========================================
-# 2. FUNGSI LOGIKA (BACKEND)
+# 2. LOGIC FUNCTIONS (BACKEND)
 # ==========================================
 
-def tentukan_age_group(age):
+def determine_age_group(age):
     if age <= 32: return 'Muda'
     elif age <= 55: return 'Dewasa'
     else: return 'Tua'
 
 def inverse_transform_data(df, stats, mapping):
-    """Mengubah data normalisasi kembali ke data asli."""
+    """Converts normalized data back to original format."""
     df_inv = df.copy()
     
-    # 1. Inverse Numerik
+    # 1. Inverse Numerical
     for col, stat in stats.items():
         if col in df_inv.columns:
             if stat['std'] == 0:
@@ -99,8 +100,8 @@ def inverse_transform_data(df, stats, mapping):
                 pass 
     return df_inv
 
-def proses_prediction_pipeline(df_input, is_normalized=False):
-    # Step 1: Inverse jika data normalisasi
+def process_prediction_pipeline(df_input, is_normalized=False):
+    # Step 1: Inverse if data is normalized
     if is_normalized:
         df_proc = inverse_transform_data(df_input, STATS, CAT_MAPPING)
     else:
@@ -108,7 +109,7 @@ def proses_prediction_pipeline(df_input, is_normalized=False):
 
     # Step 2: Handle Age Group
     if 'CustomerAge' in df_proc.columns:
-        df_proc['CustomerAgeGroup'] = df_proc['CustomerAge'].apply(tentukan_age_group)
+        df_proc['CustomerAgeGroup'] = df_proc['CustomerAge'].apply(determine_age_group)
 
     # Step 3: One-Hot Encoding
     df_encoded = pd.get_dummies(df_proc)
@@ -119,133 +120,133 @@ def proses_prediction_pipeline(df_input, is_normalized=False):
     return df_final, df_proc
 
 # ==========================================
-# 3. TAMPILAN USER INTERFACE
+# 3. USER INTERFACE DISPLAY
 # ==========================================
-st.title("Mendeteksi Fraud vs Non-Fraud 🔎")
-st.write("Mendukung Normalisasi & Labeling Otomatis")
+st.title("Fraud vs Non-Fraud Detection 🔎")
+st.write("Supports Auto-Normalization Detection & Automatic Labeling")
 
-tab1, tab2 = st.tabs(["👤 Input Manual", "📂 Upload File (Batch)"])
+tab1, tab2 = st.tabs(["👤 Manual Input", "📂 Upload File (Batch)"])
 
-# --- TAB 1: INPUT MANUAL ---
+# --- TAB 1: MANUAL INPUT ---
 with tab1:
-    st.write("Simulasi data satu nasabah untuk deteksi keamanan.")
+    st.write("Single customer data simulation for security detection.")
     col1, col2 = st.columns(2)
     with col1:
-        age = st.number_input("Umur", 18, 100, 30)
-        balance = st.number_input("Saldo", 0.0, 100000.0, 5000.0)
-        amount = st.number_input("Transaksi", 0.0, 10000.0, 100.0)
-        duration = st.number_input("Durasi", 0.0, 1000.0, 60.0)
+        age = st.number_input("Age", 18, 100, 30)
+        balance = st.number_input("Account Balance", 0.0, 100000.0, 5000.0)
+        amount = st.number_input("Transaction Amount", 0.0, 10000.0, 100.0)
+        duration = st.number_input("Duration (Sec)", 0.0, 1000.0, 60.0)
         login = st.number_input("Login Attempts", 0, 10, 1)
     with col2:
-        trans_type = st.selectbox("Tipe", ['Debit', 'Credit'])
+        trans_type = st.selectbox("Transaction Type", ['Debit', 'Credit'])
         channel = st.selectbox("Channel", ['ATM', 'Online', 'Branch'])
-        occupation = st.selectbox("Pekerjaan", ['Doctor', 'Student', 'Retired', 'Engineer', 'Others'])
-        # Tampilkan list lokasi dari mapping
+        occupation = st.selectbox("Occupation", ['Doctor', 'Student', 'Retired', 'Engineer', 'Others'])
+        # Display list of locations from mapping
         loc_options = sorted(list(CAT_MAPPING['Location'].values()))
-        location = st.selectbox("Lokasi", loc_options)
+        location = st.selectbox("Location", loc_options)
         
-    if st.button("Prediksi"):
+    if st.button("Predict"):
         data_row = pd.DataFrame({
             'TransactionAmount': [amount], 'CustomerAge': [age], 'TransactionDuration': [duration],
             'LoginAttempts': [login], 'AccountBalance': [balance], 'TransactionType': [trans_type],
             'Location': [location], 'Channel': [channel], 'CustomerOccupation': [occupation]
         })
         
-        # Proses & Prediksi
-        X_pred, _ = proses_prediction_pipeline(data_row, is_normalized=False)
+        # Process & Predict
+        X_pred, _ = process_prediction_pipeline(data_row, is_normalized=False)
         hasil = model.predict(X_pred)[0]
         
-        # --- HASIL & REKOMENDASI (KONTEKS FRAUD) ---
+        # --- RESULT & RECOMMENDATION (FRAUD CONTEXT) ---
         st.divider()
-        st.subheader("Hasil Analisis Keamanan:")
+        st.subheader("Security Analysis Result:")
         
         if hasil == 1:
-            # KASUS: FRAUD (BAHAYA - MERAH)
-            st.error("### ⚠️ PERINGATAN: Potensi Fraud Terdeteksi!")
+            # CASE: FRAUD (DANGER - RED)
+            st.error("### ⚠️ WARNING: Potential Fraud Detected!")
             
             
 
             st.markdown("""
-            **Analisis Risiko:**
-            Transaksi ini menunjukkan **anomali** atau pola yang menyimpang dari profil kebiasaan nasabah. Sistem mendeteksi indikasi aktivitas mencurigakan yang berisiko tinggi.
+            **Risk Analysis:**
+            This transaction shows **anomalies** or patterns deviating from the customer's habitual profile. The system detects high-risk suspicious activity indicators.
             
-            **Tindakan yang Harus Dilakukan (SOP):**
-            * ⛔ **HOLD Transaksi:** Jangan setujui transaksi ini secara otomatis.
-            * 📞 **Verifikasi Manual:** Hubungi nasabah segera melalui nomor terdaftar untuk konfirmasi.
-            * 🔒 **Blokir Sementara:** Jika nasabah tidak dapat dihubungi atau tidak mengenali transaksi, segera bekukan akun.
+            **Required Actions (SOP):**
+            * ⛔ **HOLD Transaction:** Do not automatically approve this transaction.
+            * 📞 **Manual Verification:** Contact the customer immediately via registered number for confirmation.
+            * 🔒 **Temporary Block:** If the customer cannot be reached or does not recognize the transaction, freeze the account immediately.
             """)
         else:
-            # KASUS: NON-FRAUD (AMAN - HIJAU)
-            st.success("### ✅ AMAN: Transaksi Normal (Non-Fraud)")
+            # CASE: NON-FRAUD (SAFE - GREEN)
+            st.success("### ✅ SAFE: Normal Transaction (Non-Fraud)")
             
             
 
             st.markdown("""
-            **Analisis Risiko:**
-            Pola transaksi konsisten dengan profil historis nasabah (Genuine User). Tidak ditemukan indikasi penyalahgunaan akun.
+            **Risk Analysis:**
+            Transaction pattern is consistent with the historical profile of the customer (Genuine User). No indications of account misuse found.
             
-            **Tindakan yang Harus Dilakukan:**
-            * ✅ **Approve:** Lanjutkan pemrosesan transaksi.
-            * ✅ **No Friction:** Tidak diperlukan verifikasi tambahan (OTP/Call) agar kenyamanan nasabah terjaga.
+            **Required Actions:**
+            * ✅ **Approve:** Proceed with transaction processing.
+            * ✅ **No Friction:** No additional verification (OTP/Call) required to maintain customer convenience.
             """)
 
 # --- TAB 2: UPLOAD FILE (BATCH) ---
 with tab2:
-    st.header("Upload File CSV")
-    st.write("Silakan upload file CSV berisi data transaksi nasabah.")
+    st.header("Upload CSV File")
+    st.write("Please upload a CSV file containing customer transaction data.")
     
-    # HAPUS: Radio button sudah dibuang
+    # NOTE: Radio button has been removed for auto-detection
     
-    uploaded_file = st.file_uploader("Pilih file CSV", type=["csv"])
+    uploaded_file = st.file_uploader("Choose CSV File", type=["csv"])
     
     if uploaded_file is not None:
         df_upload = pd.read_csv(uploaded_file)
-        st.write("Preview Data Awal:")
+        st.write("Initial Data Preview:")
         st.dataframe(df_upload.head())
         
-        if st.button("Proses & Prediksi Batch"):
+        if st.button("Process & Batch Predict"):
             try:
-                # --- LOGIKA DETEKSI OTOMATIS (AUTO-DETECT) ---
-                # Kita cek rata-rata kolom CustomerAge.
-                # Data Normalisasi biasanya berkisar -2 s/d 2 (rata-rata mendekati 0).
-                # Data Asli umurnya pasti di atas 17 tahun.
+                # --- AUTO-DETECT LOGIC ---
+                # We check the average of the CustomerAge column.
+                # Normalized data usually ranges from -2 to 2 (mean close to 0).
+                # Original data age must be above 17 years.
                 
-                is_norm = False # Default anggap data asli
+                is_norm = False # Default assume original data
                 
                 if 'CustomerAge' in df_upload.columns:
                     mean_age = df_upload['CustomerAge'].mean()
-                    if mean_age < 15: # Threshold aman
+                    if mean_age < 15: # Safe threshold
                         is_norm = True
-                        st.info("ℹ️ Sistem mendeteksi input adalah **Data Numerik (Normalisasi)**. Melakukan konversi ke Data Asli...")
+                        st.info("ℹ️ System detected input is **Numerical Data (Normalized)**. Converting to Original Data...")
                     else:
                         is_norm = False
-                        st.info("ℹ️ Sistem mendeteksi input adalah **Data Original**.")
+                        st.info("ℹ️ System detected input is **Original Data**.")
                 
-                # 1. Pipeline (Inverse otomatis jika is_norm=True)
-                X_batch, df_clean = proses_prediction_pipeline(df_upload, is_normalized=is_norm)
+                # 1. Pipeline (Inverse automatically if is_norm=True)
+                X_batch, df_clean = process_prediction_pipeline(df_upload, is_normalized=is_norm)
                 
-                # 2. Prediksi
+                # 2. Predict
                 prediksi_raw = model.predict(X_batch)
                 
-                # 3. Gabung Hasil
+                # 3. Merge Results
                 df_hasil = df_clean.copy()
                 df_hasil['Label_Cluster'] = pd.Series(prediksi_raw).map({1: 'Fraud', 0: 'Non-Fraud'})
                 
-                # 4. Tampilkan Info Sukses
-                st.success("✅ Proses Selesai! Klasifikasi Fraud/Non-Fraud berhasil.")
+                # 4. Show Success Info
+                st.success("✅ Process Completed! Fraud/Non-Fraud classification successful.")
                 
-                st.write("Preview Hasil Akhir:")
+                st.write("Final Result Preview:")
                 st.dataframe(df_hasil.head())
                 
                 # 5. Download
                 csv = df_hasil.to_csv(index=False).encode('utf-8')
                 st.download_button(
-                    label="📥 Download Hasil (CSV)",
+                    label="📥 Download Result (CSV)",
                     data=csv,
-                    file_name="hasil_fraud_detection.csv",
+                    file_name="fraud_detection_result.csv",
                     mime="text/csv"
                 )
                 
             except Exception as e:
-                st.error(f"Terjadi kesalahan: {e}")
-                st.warning("Pastikan file CSV memiliki kolom yang sesuai (TransactionAmount, CustomerAge, dll).")
+                st.error(f"An error occurred: {e}")
+                st.warning("Ensure the CSV file has appropriate columns (TransactionAmount, CustomerAge, etc.).")
