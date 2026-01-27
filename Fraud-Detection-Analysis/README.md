@@ -2,11 +2,14 @@
 
 A Machine Learning web application to detect fraudulent transactions based on customer behavior patterns. This project utilizes clustering and classification techniques to identify anomalies in financial transactions.
 
-🔗 **Live Demo:** [Click Here to Try the App](https://fraud-clustering-and-classification.streamlit.app/)
+🔗 **Live Demo:** [Click Here to Try the App](https://fraud-detection-applications.streamlit.app/)
 
-![App Screenshot]<img width="1919" height="985" alt="image" src="https://github.com/user-attachments/assets/407126c8-97da-4bc2-a924-e5c74993c327" />
-<img width="1919" height="977" alt="image" src="https://github.com/user-attachments/assets/eaf03415-759f-46a4-835b-8b57ca3c7e95" />
-<img width="1919" height="980" alt="image" src="https://github.com/user-attachments/assets/a28d8aac-c5dc-4c2c-91cb-0bf7539f91bd" />
+![App Screenshot]
+<img width="1919" height="980" alt="image" src="https://github.com/user-attachments/assets/85671b01-b4d4-403c-bb5a-3e1e7db0911a" />
+<img width="1919" height="519" alt="image" src="https://github.com/user-attachments/assets/bd8435ac-9223-4df9-b275-e9cc72e9b35b" />
+<img width="1919" height="557" alt="image" src="https://github.com/user-attachments/assets/aaf65c6f-2052-487f-824d-c5f6c4cc6aa2" />
+<img width="1919" height="980" alt="image" src="https://github.com/user-attachments/assets/0f012fb0-dc49-4439-9784-5349e0ca2c44" />
+
 
 
 ## 📋 About the Project
