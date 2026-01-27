@@ -5,6 +5,9 @@ A Machine Learning web application to detect fraudulent transactions based on cu
 🔗 **Live Demo:** [Click Here to Try the App](https://fraud-clustering-and-classification.streamlit.app/)
 
 ![App Screenshot]<img width="1919" height="985" alt="image" src="https://github.com/user-attachments/assets/407126c8-97da-4bc2-a924-e5c74993c327" />
+<img width="1919" height="977" alt="image" src="https://github.com/user-attachments/assets/eaf03415-759f-46a4-835b-8b57ca3c7e95" />
+<img width="1919" height="980" alt="image" src="https://github.com/user-attachments/assets/a28d8aac-c5dc-4c2c-91cb-0bf7539f91bd" />
+
 
 ## 📋 About the Project
 Financial fraud is a critical issue in the banking sector. This application helps identify suspicious transactions by analyzing features such as:
