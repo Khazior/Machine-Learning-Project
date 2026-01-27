@@ -9,9 +9,9 @@ st.set_page_config(page_title="Prediksi Segmen Nasabah (Final)", page_icon="🚀
 
 # Load Model
 try:
-    model = joblib.load('tuning_classification.h5')
+    model = joblib.load('analisa-ml-dicoding/deployment/tuning_classification.h5')
 except FileNotFoundError:
-    st.error("❌ File 'tuning_classification.h5' tidak ditemukan!")
+    st.error("❌ File 'analisa-ml-dicoding/deployment/tuning_classification.h5' tidak ditemukan!")
     st.stop()
 
 # --- STATISTIK UNTUK INVERSE SCALING (NUMERIK) ---
