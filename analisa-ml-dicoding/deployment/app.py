@@ -58,7 +58,7 @@ EXPECTED_COLUMNS = [
     'Location_Tucson', 'Location_Virginia Beach', 'Location_Washington', 
     'Channel_Branch', 'Channel_Online', 
     'CustomerOccupation_Engineer', 'CustomerOccupation_Retired', 'CustomerOccupation_Student', 
-    'CustomerAgeGroup_Muda', 'CustomerAgeGroup_Tua'
+    'CustomerAgeGroup_Young', 'CustomerAgeGroup_Old'
 ]
 
 # ==========================================
@@ -66,9 +66,9 @@ EXPECTED_COLUMNS = [
 # ==========================================
 
 def determine_age_group(age):
-    if age <= 32: return 'Muda'
-    elif age <= 55: return 'Dewasa'
-    else: return 'Tua'
+    if age <= 32: return 'Young'
+    elif age <= 55: return 'Mature'
+    else: return 'Old'
 
 def inverse_transform_data(df, stats, mapping):
     """Converts normalized data back to original format."""
