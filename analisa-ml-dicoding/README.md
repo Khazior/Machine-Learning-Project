@@ -32,3 +32,12 @@ The system classifies transactions into **Fraud (High Risk)** or **Non-Fraud (No
 1. Clone the repository:
    ```bash
    git clone [https://github.com/Khazior/Machine-Learning-Project.git](https://github.com/Khazior/Machine-Learning-Project.git)
+   ```
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Run the app:
+   ```bash
+   streamlit run app.py
+   ```
