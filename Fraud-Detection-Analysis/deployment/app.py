@@ -10,9 +10,9 @@ st.set_page_config(page_title="Fraud Detection System", page_icon="🚀", layout
 # Load Model
 try:
     # Ensure this path matches your GitHub repository structure
-    model = joblib.load('analisa-ml-dicoding/deployment/tuning_classification.h5')
+    model = joblib.load('Fraud-Detection-Analysis/deployment/tuning_classification.h5')
 except FileNotFoundError:
-    st.error("❌ File 'analisa-ml-dicoding/deployment/tuning_classification.h5' not found!")
+    st.error("❌ File 'Fraud-Detection-Analysis/deployment/tuning_classification.h5' not found!")
     st.stop()
 
 # --- STATISTICS FOR INVERSE SCALING (NUMERICAL) ---
